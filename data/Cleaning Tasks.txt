@@ -1,0 +1,15 @@
+Sam: 2 - 20
+MikeSr.: 21 - 40
+MikeJr.: 41 - 60
+CHarlie: 61 - 79
+
+Remember:
+	Work in dataset copies
+	Include the ID column
+	Don't drop rows or columns
+	Save your subset of data to the clean_data folder
+	Keep notes on column name changes, or anything interesting
+	Do impute missing values
+	Comment your code.
+
+	don't_be_a_dickhead = True
