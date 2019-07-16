@@ -1,0 +1,8 @@
+Added Columns
+DtSold <- Combination of YrSold and MoSold as datetime (the day of each date was arbitrarily chosen as 1)
+
+
+
+Dropped Columns
+MoSold <- information is contained within DtSold
+YrSold <- information is contained within DtSold
