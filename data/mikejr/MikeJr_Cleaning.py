@@ -4,7 +4,8 @@ import pandas as pd
 import csv
 
 ### load data
-train_data = pd.read_csv('../data/test.csv')
+train_data = pd.read_csv('./data/train.csv')
+
 ### subset data
 train_subset = pd.concat([train_data[['Id']],train_data.iloc[:,40:60]],axis=1)
 
