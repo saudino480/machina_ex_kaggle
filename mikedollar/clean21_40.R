@@ -1,5 +1,13 @@
+# This script will clean the training set for columns 21 - 40.  For columns missing data,
+# imputation was used based on the classifcation of MCAR, MAR, and MNAR.  There were only
+# MCAR missing for this range.  The rest of the 'NA' values were used for classifications.
+# Those values were replaced by 'None' for character entries.  Only one value was imputed 
+# by discretion, and the rest were imputedbased on common sense.  For example, if a
+# basement is non-existent, then it should not be described as unfinished.
 
-train <- read.csv('data/train.csv', stringsAsFactors = F)
+# This script may need to be updated for the testing data set.
+
+train <- read.csv('../data/train.csv', stringsAsFactors = F)
 
 
 
@@ -74,6 +82,17 @@ for (i in c(1:length(train$BsmtFinSF1))){
 
 # impute BsmtFinType2 missing data point to be Unf
 train$BsmtFinType2[is.na(train$BsmtFinType2)] = 'Unf'
+
+# impute BsmtExpsure
+
+# # check relation with TotalBsmtSF = 936
+# library(ggplot2)
+# ggplot(data=train, aes(x=TotalBsmtSF, fill=BsmtExposure)) +
+#   geom_histogram() +
+#   xlim(500,1000)
+# # this plot indicates the value of Av to be the most frequently used for that particular square footage.
+
+train$BsmtExposure[is.na(train$BsmtExposure)] = 'Av'
 
 train[c(1,21:40)]
 write.csv(train[c(1,21:40)], 'train21_40.csv')
