@@ -1,10 +1,10 @@
 ### packages
 import numpy as np
 import pandas as pd
-
+import csv
 
 ### load data
-train_data = pd.read_csv('./data/test.csv')
+train_data = pd.read_csv('../data/test.csv')
 ### subset data
 train_subset = pd.concat([train_data[['Id']],train_data.iloc[:,40:60]],axis=1)
 
@@ -25,13 +25,25 @@ train_subset.KitchenQual[train_subset.KitchenQual.isna()] = 'TA'
 train_subset.Functional[train_subset.Functional.isna()] = 'Typ'
 train_subset.GarageYrBlt[train_subset.GarageYrBlt.isna()] = 0000
 
-###
-
-for column in train_subset.columns:
-    print(column)
-    print(train_subset[column].unique())
+### dummify and drop redundancies
 
 dummy_cols = ['HeatingQC','CentralAir','Electrical','GarageType','KitchenQual',
                 'Functional','FireplaceQu']
+dummy_drop_cols = ['HeatingQC_TA','CentralAir_N','Electrical_FuseA','KitchenQual_TA',
+                    'Functional_Typ','FireplaceQu_None','GarageType_None']
 
-dummy_drop_cols = ['TA','N','FuseP','TA','Typ','None']
+dummies_df = pd.get_dummies(train_subset[dummy_cols])
+
+dummy_drop_cols.extend(dummy_cols)
+
+train_subset = pd.concat([train_subset,dummies_df],axis=1).drop(dummy_drop_cols,axis=1)
+
+### write csv
+
+with open('mikejr_clean.csv',mode='w') as file:
+    data_writer = csv.writer(file,delimiter=',')
+
+    data_writer.writerow(train_subset.columns.tolist())
+
+    for row in range(len(train_subset)):
+        data_writer.writerow(train_subset.iloc[row].tolist())
