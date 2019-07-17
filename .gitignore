@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Pycharm, R, and Jupyter Notebook#
 ###################
 *.idea 
@@ -60,3 +61,6 @@ Thumbs.db
 /Scrapy/gog/*
 /Scrapy/upwork/*
 /Scrapy/winespec/*
+=======
+*.ipynb-checkpoints
+>>>>>>> 996167c916888c23a0764755571db4f2e2e47595

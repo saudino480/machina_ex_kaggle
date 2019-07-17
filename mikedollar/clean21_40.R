@@ -1,5 +1,5 @@
 
-train <- read.csv('raw_data/train.csv', stringsAsFactors = F)
+train <- read.csv('data/train.csv', stringsAsFactors = F)
 
 
 
@@ -76,4 +76,4 @@ for (i in c(1:length(train$BsmtFinSF1))){
 train$BsmtFinType2[is.na(train$BsmtFinType2)] = 'Unf'
 
 train[c(1,21:40)]
-write.csv(train[c(1,21:40)], 'machina_ex_kaggle/mikedollar/')
+write.csv(train[c(1,21:40)], 'train21_40.csv')
