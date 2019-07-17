@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+*.ipynb-checkpoints
+=======
+<<<<<<< HEAD
 # Pycharm, R, and Jupyter Notebook#
 ###################
 *.idea 
@@ -64,3 +67,4 @@ Thumbs.db
 =======
 *.ipynb-checkpoints
 >>>>>>> 996167c916888c23a0764755571db4f2e2e47595
+>>>>>>> 2a3cf8bbf3b1ee053276f7c718a68d7a6e998711

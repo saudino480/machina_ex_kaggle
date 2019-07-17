@@ -1,3 +1,7 @@
+
+
+############# Columns: 61 - 79 #################
+
 Added Columns
 DtSold <- Combination of YrSold and MoSold as datetime (the day of each date was arbitrarily chosen as 1)
 
