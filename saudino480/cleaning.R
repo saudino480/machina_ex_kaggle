@@ -9,7 +9,8 @@ library(stringr)
 housing = read.csv("../data/train.csv")
 #housing = read.csv("../data/test.csv")
 
-
+test = housing %>%
+  filter(Id == 949)
 
 my_slice = housing[,1:21]
 
