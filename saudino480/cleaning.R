@@ -3,6 +3,7 @@ library(dplyr)
 library(ggrepel)
 library(stringr)
 
+source('./helper.R')
 
 # This assumes that you are in a named folder in the root directory of the
 # GitHub project.
@@ -66,9 +67,7 @@ my_slice$LandSlope = NULL
 #         3 = IR3
 #
 lot_list = unique(as.character(my_slice$LotShape))
-my_slice$LotShape = ifelse(my_slice$LotShape == "Reg", 0,
-              ifelse(my_slice$LotShape == "IR1", 1, 
-                     ifelse(my_slice$LotShape == "IR2", 2, 3)))
+my_slice$LotShape = nested_ifelse(my_slice$LotShape, lot_list)
 
 
 #### Land Contour ####
@@ -81,9 +80,7 @@ my_slice$LotShape = ifelse(my_slice$LotShape == "Reg", 0,
 #
 contour_list = unique(as.character(my_slice$LandContour))
 
-my_slice$LandContour = ifelse(my_slice$LandContour == contour_list[1], 0,
-                           ifelse(my_slice$LandContour == contour_list[2], 1, 
-                                  ifelse(my_slice$LandContour == contour_list[3], 2, 3)))
+my_slice$LandContour = nested_ifelse(my_slice$LandContour, contour_list)
 
 #### Lot Config ####
 #elim FR3 category and cast rest to dummies, perhaps consider making this
@@ -98,10 +95,9 @@ my_slice$LandContour = ifelse(my_slice$LandContour == contour_list[1], 0,
 
 my_slice$LotConfig = as.character(my_slice$LotConfig)
 my_slice$LotConfig[my_slice$LotConfig == "FR3"] = "FR2"
+
 config_list = unique(my_slice$LotConfig)
-my_slice$LotConfig = ifelse(my_slice$LotConfig == config_list[1], 0,
-                           ifelse(my_slice$LotConfig == config_list[2], 1, 
-                                  ifelse(my_slice$LotConfig == config_list[3], 2, 3)))
+my_slice$LotConfig = nested_ifelse(my_slice$LotConfig, config_list)
 
 #### BldgType ####
 #consider eliminating the Twnhs or TwnhsE category, essentially similar
@@ -114,10 +110,7 @@ my_slice$LotConfig = ifelse(my_slice$LotConfig == config_list[1], 0,
 #         4 = Townhouse Inside Unit
 #         
 bldg_list = unique(as.character(my_slice$BldgType))
-my_slice$BldgType = ifelse(my_slice$BldgType == bldg_list[1], 0,
-                            ifelse(my_slice$BldgType == bldg_list[2], 1, 
-                                   ifelse(my_slice$BldgType == bldg_list[3], 2, 
-                                          ifelse(my_slice$BldgType == bldg_list[4], 3, 4))))
+my_slice$BldgType = nested_ifelse(my_slice$BldgType, bldg_list)
 
 
 #### MS Zoning ####
@@ -130,10 +123,7 @@ my_slice$BldgType = ifelse(my_slice$BldgType == bldg_list[1], 0,
 #         4 = Floating Village Residential
 #
 zoning_list = unique(as.character(my_slice$MSZoning))
-my_slice$MSZoning = ifelse(my_slice$MSZoning == zoning_list[3], 0,
-                           ifelse(my_slice$MSZoning == zoning_list[1], 1, 
-                                  ifelse(my_slice$MSZoning == zoning_list[2], 2, 
-                                         ifelse(my_slice$MSZoning == zoning_list[5], 3, 4))))
+my_slice$MSZoning = nested_ifelse(my_slice$MSZoning, zoning_list)
 
 
 #### Conditions ####
@@ -167,13 +157,9 @@ my_slice$Condition2[my_slice$Condition2 %in% pos_att] = "pos"
 
 #dummy
 cond_list = unique(my_slice$Condition1)
-my_slice$Condition1 = ifelse(my_slice$Condition1 == cond_list[1], 0,
-                            ifelse(my_slice$Condition1 == cond_list[2], 1, 
-                                   ifelse(my_slice$Condition1 == cond_list[3], 2, 3)))
+my_slice$Condition1 = nested_ifelse(my_slice$Condition1, cond_list)
 
-my_slice$Condition2 = ifelse(my_slice$Condition2 == cond_list[1], 0,
-                             ifelse(my_slice$Condition2 == cond_list[2], 1, 
-                                    ifelse(my_slice$Condition2 == cond_list[3], 2, 3)))
+my_slice$Condition2 = nested_ifelse(my_slice$Condition2, cond_list)
 
 #making all lowercase, save to CSV
 colnames(my_slice) = tolower(colnames(my_slice))
