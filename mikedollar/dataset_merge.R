@@ -1,12 +1,12 @@
 library(dplyr)
-df1 <- read.table('Charlie/cleaned_data.csv')
-df2 <- read.csv('data/mikejr/mikejr_clean.csv')
-df3 <- read.csv('mikedollar/train21_40.csv')
-df4 <- read.csv('saudino480/clean_data_1_20.csv')
-df5 <- read.csv('data/train.csv')
+df1 <- read.csv('clean_data/sam_slice_clean.csv')
+df2 <- read.csv('clean_data/mike_slice_clean.csv')
+df3 <- read.csv('clean_data/mikejr_slice_clean.csv')
+df4 <- read.csv('clean_data/charlie_slice_clean.csv')
+df5 <- read.csv('../data/train.csv')
 
 correct_names <- function(df) {
-  names(df) <- gsub('\\.','_',tolower(names(df)))
+  names(df) <- gsub('\\.','_',names(df)) # I took out the tolower function so the columns are more readable.
   return (df) }
 
 
@@ -17,13 +17,12 @@ df3 = correct_names(df3)
 df4 = correct_names(df4)
 df5 = correct_names(df5)
 
-df5 = df5 %>% select(id, saleprice)
-df4 = df4 %>% select(-x)
-df3 = df3 %>% select(-x)
+df5 = df5 %>% select(Id, SalePrice)
+
 
 
 
 dfout = bind_cols(list(df1,df2,df3,df4,df5))
-dfout = dfout %>% select(-id1,-id2,-id3,-id4)
+dfout = dfout %>% select(-Id1,-Id2,-Id3,-Id4)
 
-write.table(dfout,file='data/cleaned_dataset_train.csv',sep = ',')
+write.csv(dfout,'clean_data/train_clean.csv',row.names = F)
