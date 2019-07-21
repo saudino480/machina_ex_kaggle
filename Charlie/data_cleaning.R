@@ -5,7 +5,7 @@ library(magrittr)
 library(mice)
 
 
-df <- read.table('data/train.csv',header=TRUE,sep=",",stringsAsFactors = FALSE)
+df <- read.table('../data/train.csv',header=TRUE,sep=",",stringsAsFactors = FALSE)
 
 df = dplyr::select(df,Id, 61:79)
 
