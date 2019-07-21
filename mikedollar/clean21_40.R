@@ -7,8 +7,12 @@
 
 # This script may need to be updated for the testing data set.
 
-train <- read.csv('../data/train.csv', stringsAsFactors = F)
 
+df <- read.csv('../data/train.csv', stringsAsFactors = F)
+
+# specify column integer range:  m:n
+m = 21
+n = 40
 
 
 ###############################
@@ -36,20 +40,20 @@ train <- read.csv('../data/train.csv', stringsAsFactors = F)
 # MCAR, as opposed to the 37 other NA values.  That being said, I only wanted to replace
 # via the index from either BsmtQual or BsmtCond.
 
-idx_Bsmt = which(is.na(train$BsmtQual))
-train$BsmtQual[idx_Bsmt] = 'None'
-train$BsmtCond[idx_Bsmt] = 'None'
-train$BsmtExposure[idx_Bsmt] = 'None'
-train$BsmtFinType1[idx_Bsmt] = 'None'
-train$BsmtFinType2[idx_Bsmt] = 'None'
+idx_Bsmt = which(is.na(df$BsmtQual))
+df$BsmtQual[idx_Bsmt] = 'None'
+df$BsmtCond[idx_Bsmt] = 'None'
+df$BsmtExposure[idx_Bsmt] = 'None'
+df$BsmtFinType1[idx_Bsmt] = 'None'
+df$BsmtFinType2[idx_Bsmt] = 'None'
 
-train$MasVnrType[is.na(train$MasVnrType)] = 'None'
-train$MasVnrArea[is.na(train$MasVnrArea)] = 0
+df$MasVnrType[is.na(df$MasVnrType)] = 'None'
+df$MasVnrArea[is.na(df$MasVnrArea)] = 0
 
 
 # so now, I will look at the last two missing values...
-idx_BsmtExposure = which(is.na(train$BsmtExposure))
-idx_BsmtFinType2 = which(is.na(train$BsmtFinType2))
+idx_BsmtExposure = which(is.na(df$BsmtExposure))
+idx_BsmtFinType2 = which(is.na(df$BsmtFinType2))
 
 
 
@@ -71,17 +75,17 @@ idx_BsmtFinType2 = which(is.na(train$BsmtFinType2))
 # if BsmtFinSF2 == TotalBsmtSF, then BsmtFinType1 = None
 
 i=0
-for (i in c(1:length(train$BsmtFinSF1))){
-  if (train$BsmtFinSF1[i] == train$TotalBsmtSF[i]){
-    train$BsmtFinType2[i] = 'None'
+for (i in c(1:length(df$BsmtFinSF1))){
+  if (df$BsmtFinSF1[i] == df$TotalBsmtSF[i]){
+    df$BsmtFinType2[i] = 'None'
   }
-  if (train$BsmtFinSF2[i] == train$TotalBsmtSF[i]){
-    train$BsmtFinType1[i] = 'None'
+  if (df$BsmtFinSF2[i] == df$TotalBsmtSF[i]){
+    df$BsmtFinType1[i] = 'None'
   }
 }
 
 # impute BsmtFinType2 missing data point to be Unf
-train$BsmtFinType2[is.na(train$BsmtFinType2)] = 'Unf'
+df$BsmtFinType2[is.na(df$BsmtFinType2)] = 'Unf'
 
 # impute BsmtExpsure
 
@@ -92,7 +96,19 @@ train$BsmtFinType2[is.na(train$BsmtFinType2)] = 'Unf'
 #   xlim(500,1000)
 # # this plot indicates the value of Av to be the most frequently used for that particular square footage.
 
-train$BsmtExposure[is.na(train$BsmtExposure)] = 'Av'
+df$BsmtExposure[is.na(df$BsmtExposure)] = 'Av'
 
-train[c(1,21:40)]
-write.csv(train[c(1,21:40)], 'train21_40.csv')
+# change to lowercase
+colnames(df)[m:n] = tolower(colnames(df)[m:n])
+
+# get list of categorical column names
+
+# slice = df[colnames(df)[m:n]]
+# 
+# catlist = colnames(slice[, sapply(slice, class) == 'character'])
+
+
+
+write.csv(df[c(1,m:n)], 'train21_40.csv')
+
+

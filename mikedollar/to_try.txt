@@ -1,0 +1,19 @@
+split off 25% of the data set for testing.
+cross validation (K fold)
+
+
+maybe I could use a correlation matrix to find the most correlated features, and then use them for feature engineering.
+Then, I can start feature selection.
+
+try different loss functions.
+understand the metric for effective modeling.
+
+
+feature selection
+
+issue of multicollinearity
+######
+run a simple linear regression of all combinations features (minus the target variable),
+and look at the rsquares as a measure of collinearity.
+
+get correlation matrix and choose features based on absolute value of correlation
