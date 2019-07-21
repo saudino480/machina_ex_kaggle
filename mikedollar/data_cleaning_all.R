@@ -19,6 +19,9 @@ md.pattern(sam_slice, rotate.names = T)
 sam_slice$LotFrontage[is.na(sam_slice$LotFrontage)] = 0
 sam_slice$Alley[is.na(sam_slice$Alley)] = 'None'
 
+# change  MSSubClass to character type, because it is a numeric nominal categorical variable.
+sam_slice$MSSubClass = as.character(sam_slice$MSSubClass)
+
 md.pattern(sam_slice, rotate.names = T)
 
 write.csv(sam_slice, 'clean_data/sam_slice_clean.csv', row.names = F)

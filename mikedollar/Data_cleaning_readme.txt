@@ -4,6 +4,7 @@
 ### Columns 1:20
 -changed LotFrontage (numerical) NA's to 0
 -changed Alley (character) NA's to 'None'
+-changed MSSubClass (numeric) to character type.  This is because it is a numeric nominal categorical variable.
 
 ### Columns 21:40
 -Changed all character-class Bsmt columns with shared NA's to 'None'.
