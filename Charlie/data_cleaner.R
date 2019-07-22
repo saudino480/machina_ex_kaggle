@@ -10,9 +10,7 @@ add_level <- function(col, val='None'){
 ready_df <- function(train_df, test_df){
   #Cleans/Imputes Kaggle Housing Dataset
   
-  df <- rbind(test_df,train_df %>% select(-SalePrice))
-  
-  
+  df <- rbind(train_df %>% select(-SalePrice), test_df)
   
   
   ######Imputation######
@@ -71,20 +69,20 @@ ready_df <- function(train_df, test_df){
   
   ######Package for Return######
   SalePrice <- train_df$SalePrice
-  train <- cbind(df[1:1460,],SalePrice)
-  test <- df[1461:2919,]
+  sales <- data.frame("SalePrice" = train_df$SalePrice)
+
   
-  
-  list(train_ready = train, test_ready = test)
+  list(train_ready = cbind(df[1:1460,],sales),
+       test_ready = df[1461:2919,])
 }
 
-test_i <- read.csv("data/test.csv")
-train_i <- read.csv('data/train.csv')
-ret = ready_df(train_i, test_i)
-list2env(ret,env=environment())
+test <- read.csv("data/test.csv")
+train <- read.csv('data/train.csv')
+
+list2env(ready_df(train, test),env=environment())
 
 
 
 apply(is.na(test_ready),2,sum)
-write.csv(x=train_ready,file = 'Charlie/datafiles/train_cc_clean.csv')
-write.csv(x=test_ready,file = 'Charlie/datafiles/test_cc_clean.csv')
+write.csv(x=train_ready,file = 'Charlie/datafiles/train_cc_clean.csv',row.names = F)
+write.csv(x=test_ready,file = 'Charlie/datafiles/test_cc_clean.csv',row.names = F)
