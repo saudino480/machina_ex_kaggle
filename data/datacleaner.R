@@ -1,4 +1,5 @@
 library(dplyr)
+library(forcats)
 
 add_level <- function(col, val='None'){
   #Adds a level to the column factor, replaces all NA"s with val
@@ -103,26 +104,74 @@ ready_df <- function(train_df, test_df){
        test_ready = df[1461:2919,])
 }
 
-## Categorical Binning
-cat_binning <- function(train_df, test_df){
-  df <- rbind(train_df %>% select(-SalePrice),test_df)
-  
-  ###### Write Functions Within Here ######
- 
-  ### Print out Stat Sheets on Each Categorical Variable
-  for (i in names(df)) {
-    if (is.factor(df[,i])) {
+cat_stat_sheet <- function(train, test) {
+  for (i in names(train)) {
+    if (is.factor(train[,i])) {
       print(paste('*****',i,'*****'))
-      SalesStats = train_df %>% group_by_(i) %>% 
+      SalesStats = train %>% group_by_(i) %>% 
         dplyr::summarise(t = median(SalePrice),m = mean(SalePrice),sd = sd(SalePrice))
       names(SalesStats) = c('Var1','t','m','sd')
-      out = merge(data.frame(table(train_df[,i])),data.frame(table(test_df[,i])),by='Var1',all = T)
+      out = merge(data.frame(table(train[,i])),data.frame(table(test[,i])),by='Var1',all = T)
       out <- merge(out,SalesStats,by='Var1',all=T)
       names(out) <- c('Name','Train','Test','SalesMed','SalesMean','SalesSD')
       print(out %>% arrange(SalesMed))
     }
   }
+  return (NA)
+}
+
+
+
+create_other_train <- function(col, perc=0.05) {
+  # Create an 'othr' factor for levels with a population of less than perc (default 0.05)
+  pop = list()
+  for (i in levels(col)) {
+    if (count(col == i)[2,2] < nrow(train) * perc) {
+      pop <- c(pop, i)
+    }
+  }
+  return(col <- col %>% fct_collapse(Othr = pop))
+}
+
+create_other_test <- function(col, trained){
+  trained_factors <- levels(trained)
+  test_factors <- levels(col)
+  col <- col %>% fct_collapse(Othr = test_factors[test_factors %ni% trained_factors])
+  return (col)
+}
   
+create_other_total <- function(col, perc=0.05) {
+  # Create an 'othr' factor for levels with a population of less than perc (default 0.05)
+  pop = list()
+  for (i in levels(col)) {
+    if (count(col == i)[2,2] < 2919 * perc) {
+      pop <- c(pop, i)
+    }
+  }
+  return(col <- col %>% fct_collapse(Othr = pop))
+}
+
+
+## Categorical Binning
+cat_binning <- function(train_df, test_df){
+  df <- rbind(train_df %>% select(-SalePrice),test_df)
+  
+  ###### Write Functions Within Here ######
+  ## To Be Binned ##
+
+  df$LotShape <- df$LotShape %>% fct_collapse(IRG = c('IR1','IR2','IR3'))
+  df$MasVnrType <- df$MasVnrType %>% fct_collapse(None = c('BrkCmn','None'))
+  
+  #cat_stat_sheet(df, train_df, test_df)
+  
+  
+  
+  ### Bin Categories by Frequency of Appearance. Default is 5%
+  for (i in names(df)) {
+    if (is.factor(df[,i])) {
+      df[,i] <- create_other_total(df[,i])
+    }
+  }
   
   
   
@@ -137,8 +186,6 @@ cat_binning <- function(train_df, test_df){
 }
 
 
-
-
 test <- read.csv("data/Raw Data/test.csv")
 train <- read.csv('data/Raw Data/train.csv')
 list2env(ready_df(train, test),env=environment())
@@ -147,33 +194,7 @@ list2env(ready_df(train, test),env=environment())
 list2env(cat_binning(train_ready,test_ready),env=environment())
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-total = rbind(train_ready %>% select(-SalePrice),test_ready)
-# Check categorical significance
-for (i in names(total)) {
-  if (is.factor(total[,i])) {
-    print(paste('*****',i,'******'))
-    SalesMed = train %>% group_by_(i) %>% dplyr::summarise(t = median(SalePrice),m = mean(SalePrice),sd = sd(SalePrice))
-    df <- (merge(data.frame(table(train[,i])), data.frame(table(test[,i]),by = 'Var1',all=T)))
-    df <- df[,-4]
-    names(df) <- c('Name','Train','Test','SalesMed','SalesMean','SalesSD')
-    print(df %>% arrange(SalesMed))
-  }
-}
-
-
+cat_stat_sheet(train_binned, test_binned)
 
 
 
