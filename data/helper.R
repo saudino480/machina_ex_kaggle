@@ -6,8 +6,9 @@ library(fastDummies)
 library(lubridate)
 
 nested_ifelse = function(dfcol, list, i = 0) {
-  ifelse(dfcol == list[i+1], i, nested_ifelse(dfcol, list, i+1))
+    ifelse((dfcol == list[i+1]), i, nested_ifelse(dfcol, list, i+1))
 }
+
 
 finalPass = function(df) {
 
@@ -15,11 +16,15 @@ finalPass = function(df) {
   
   final_pass$dtsold = as.character(final_pass$dtsold)
   
+  final_pass$dtsold[is.na(final_pass$dtsold)] = "0000-00"
+  
   final_pass$yrsold = as.numeric(substr(final_pass$dtsold, 0, 4))
   
   final_pass$monthsold = as.numeric(substr(final_pass$dtsold, 6, 7))
   
   final_pass$dtsold = NULL
+  
+  final_pass$roofstyle[is.na(final_pass$roofstyle)] = "None"
   
   roofstyle_list = unique(final_pass$roofstyle)
   final_pass$roofstyle = nested_ifelse(final_pass$roofstyle, roofstyle_list)
@@ -30,6 +35,10 @@ finalPass = function(df) {
   temp = colnames(final_pass)[idx_list]
   
   for (col in temp) {
+    final_pass[[col]] = as.character(final_pass[[col]])
+    if (length(final_pass[[col]][is.na(final_pass[[col]])] > 0)) {
+      final_pass[[col]][is.na(final_pass[[col]])] = "None"
+    }
     col_list = unique(final_pass[[col]])
     print(col_list)
     final_pass[[col]] = nested_ifelse(final_pass[[col]], col_list)
@@ -77,6 +86,10 @@ SamsCleaner = function(df) {
   #         0 = Not All Included
   #         1 = All Included
   #
+  my_slice$Utilities = as.character(my_slice$Utilities)
+  if (length(my_slice$Utilities[is.na(my_slice$Utilities)] > 0)) {
+    my_slice$Utilities[is.na(my_slice$Utilities)] = "None"
+  }
   my_slice$Utilities = ifelse(my_slice$Utilities == "AllPub", 1, 0)
   
   #### Land Slope ####
@@ -95,7 +108,11 @@ SamsCleaner = function(df) {
   #         2 = IR2
   #         3 = IR3
   #
-  lot_list = unique(as.character(my_slice$LotShape))
+  my_slice$LotShape = as.character(my_slice$LotShape)
+  if (length(my_slice$LotShape[is.na(my_slice$LotShape)] > 0)) {
+    my_slice$LotShape[is.na(my_slice$LotShape)] = "None"
+  }
+  lot_list = unique(my_slice$LotShape)
   my_slice$LotShape = nested_ifelse(my_slice$LotShape, lot_list)
   
   
@@ -151,6 +168,10 @@ SamsCleaner = function(df) {
   #         3 = Residential (High Density)
   #         4 = Floating Village Residential
   #
+  my_slice$MSZoning = as.character(my_slice$MSZoning)
+  if (length(my_slice$MSZoning[is.na(my_slice$MSZoning)] > 0)) {
+    my_slice$MSZoning[is.na(my_slice$MSZoning)] = "None"
+  }
   zoning_list = unique(as.character(my_slice$MSZoning))
   my_slice$MSZoning = nested_ifelse(my_slice$MSZoning, zoning_list)
   
@@ -227,13 +248,25 @@ MikeDClean = function(df) {
   idx_Bsmt = which(is.na(df$BsmtQual))
   df$BsmtQual[idx_Bsmt] = 'None'
   df$BsmtCond[idx_Bsmt] = 'None'
+  if (length(df$BsmtCond[is.na(df$BsmtCond)] > 0)) {
+    df$BsmtCond[is.na(df$BsmtCond)] = 'None'
+  }
+  
   df$BsmtExposure[idx_Bsmt] = 'None'
   df$BsmtFinType1[idx_Bsmt] = 'None'
   df$BsmtFinType2[idx_Bsmt] = 'None'
   
   df$MasVnrType[is.na(df$MasVnrType)] = 'None'
   df$MasVnrArea[is.na(df$MasVnrArea)] = 0
+  df$Exterior1st = as.character(df$Exterior1st)
+  if (length(df$Exterior1st[is.na(df$Exterior1st)] > 0)) {
+    df$Exterior1st[is.na(df$Exterior1st)] = "VinylSd"
+  }
   
+  df$Exterior2nd = as.character(df$Exterior2nd)
+  if (length(df$Exterior2nd[is.na(df$Exterior2nd)] > 0)) {
+    df$Exterior2nd[is.na(df$Exterior2nd)] = "None"
+  }
   
   # so now, I will look at the last two missing values...
   idx_BsmtExposure = which(is.na(df$BsmtExposure))
@@ -246,6 +279,9 @@ MikeDClean = function(df) {
   
   # i have found another issue.  There are incorrect values for some of the basement entries.
   
+  if (length(df$BsmtUnfSF[is.na(df$BsmtUnfSF)] > 0)) {
+    df$BsmtUnfSF[is.na(df$BsmtUnfSF)] = 0
+  }
   
   
   # View(df %>% 
@@ -310,14 +346,43 @@ CharlieClean = function(df) {
     
     df[order(df$GarageArea),] %>% select('Id','GarageArea','GarageQual','GarageCond','GarageCars')
     #mice::md.pattern(df %>% select(c('GarageFinish','GarageQual','GarageArea','GarageCond')))
+    if (length(df$GarageArea[is.na(df$GarageArea)] > 0)) {
+      df$GarageArea[is.na(df$GarageArea)] = 0
+    }
     
     df$GarageCond[df$GarageArea == 0] = 'None'
+    if (length(df$GarageCond[is.na(df$GarageCond)] > 0)) {
+      df$GarageCond[is.na(df$GarageCond)] = 'None'
+    }
+    print(unique(df$GarageCond))
     df$GarageFinish[df$GarageArea == 0] = 'None'
+    if (length(df$GarageFinish[is.na(df$GarageFinish)] > 0)) {
+      df$GarageFinish[is.na(df$GarageFinish)] = 'None'
+    }
+    print(unique(df$GarageFinish))
     df$GarageQual[df$GarageArea == 0] = 'None'
+    if (length(df$GarageQual[is.na(df$GarageQual)] > 0)) {
+      df$GarageQual[is.na(df$GarageQual)] = 'None'
+    }
+    print(unique(df$GarageQual))
+    df$GarageCars[df$GarageArea == 0] = 0
     df$PoolQC[df$PoolArea == 0] = 'None'
+    if (length(df$PoolQC[is.na(df$PoolQC)] > 0)) {
+      df$PoolQC[is.na(df$PoolQC)] = 'None'
+    }
+    
     df$Fence[is.na(df$Fence)] = 'None'
     df$MiscFeature[df$MiscVal == 0] = 'None'
+    if (length(df$MiscFeature[is.na(df$MiscFeature)] > 0)) {
+      df$MiscFeature[is.na(df$MiscFeature)] = 'None'
+    }
     #mice::md.pattern(df %>% select(c('MiscFeature','MiscVal','PoolQC','Fence')))
+    if (length(df$SaleType[is.na(df$SaleType)] > 0)) {
+      df$SaleType[is.na(df$SaleType)] = 0
+    }
+    if (length(df$GarageFinish[is.na(df$GarageFinish)]) > 0) {
+      df$GarageFinish[is.na]
+    }
     
     options(na.action='na.pass')
     
@@ -338,6 +403,11 @@ CharlieClean = function(df) {
     MiscFeature.f = factor(df$MiscFeature)
     df = cbind(df %>% select(-MiscFeature),model.matrix(~MiscFeature.f)[,-1])
     #df %>% head()
+    
+    if (length(df$SaleType.fcon[is.na(df$SaleType.fcon)] > 0)) {
+      df$SaleType.fcon[is.na(df$SaleType.fcon)] = 0
+    }
+    
     return(df)
 }
 
@@ -356,7 +426,8 @@ MikeJrClean = function(df) {
   
   
   temp = fastDummies::dummy_cols(df, select_columns = dummy_cols, remove_first_dummy = TRUE)
-  
+  temp = temp %>%
+    select(-dummy_cols)
   return(temp)
 }
 
@@ -374,7 +445,7 @@ full_clean = function(read_path, write_path, dummies = FALSE) {
     colnames(cleanC) = tolower(colnames(cleanC))
     colnames(cleanMJ) = tolower(colnames(cleanMJ))
     
-    df_list = list(cleanS, cleanMD, cleanC, cleanMJ)
+    df_list = list(cleanS, cleanMD, cleanMJ, cleanC)
     
     full_df = df_list[[1]]
     for (i in 2:length(df_list)) {
@@ -386,6 +457,8 @@ full_clean = function(read_path, write_path, dummies = FALSE) {
     if (dummies) {
       full_df = finalPass(full_df)
     }
+    
+    
     
     write.csv(full_df, write_path)
     

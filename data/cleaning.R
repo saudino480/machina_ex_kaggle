@@ -10,7 +10,7 @@ source('./data/helper.R')
 # GitHub project.
 
 
-train_output = full_clean(read_path = './data/train.csv', write_path = './data/cleaned_train.csv', dummies = TRUE)
+train_output = full_clean(read_path = './data/train.csv', write_path = './data/cleaned_train.csv', dummies = FALSE)
 
-test_output = full_clean('./data/test.csv', './data/cleaned_test.csv', dummies = TRUE)
+test_output = full_clean('./data/test.csv', './data/cleaned_test.csv', dummies = FALSE)
 
