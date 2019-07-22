@@ -86,5 +86,5 @@ list2env(ret,env=environment())
 
 
 apply(is.na(test_ready),2,sum)
-
-
+write.csv(x=train_ready,file = 'Charlie/datafiles/train_cc_clean.csv')
+write.csv(x=test_ready,file = 'Charlie/datafiles/test_cc_clean.csv')
