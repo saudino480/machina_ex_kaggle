@@ -107,7 +107,27 @@ ready_df <- function(train_df, test_df){
 cat_binning <- function(train_df, test_df){
   df <- rbind(train_df %>% select(-SalePrice),test_df)
   
+  ###### Write Functions Within Here ######
+ 
+  ### Print out Stat Sheets on Each Categorical Variable
+  for (i in names(df)) {
+    if (is.factor(df[,i])) {
+      print(paste('*****',i,'*****'))
+      SalesStats = train_df %>% group_by_(i) %>% 
+        dplyr::summarise(t = median(SalePrice),m = mean(SalePrice),sd = sd(SalePrice))
+      names(SalesStats) = c('Var1','t','m','sd')
+      out = merge(data.frame(table(train_df[,i])),data.frame(table(test_df[,i])),by='Var1',all = T)
+      out <- merge(out,SalesStats,by='Var1',all=T)
+      names(out) <- c('Name','Train','Test','SalesMed','SalesMean','SalesSD')
+      print(out %>% arrange(SalesMed))
+    }
+  }
   
+  
+  
+  
+  
+  ###### STOP HERE ######
   
   SalePrice <- train_df$SalePrice
   sales <- data.frame("SalePrice" = train_df$SalePrice)
@@ -125,6 +145,36 @@ list2env(ready_df(train, test),env=environment())
 
 
 list2env(cat_binning(train_ready,test_ready),env=environment())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+total = rbind(train_ready %>% select(-SalePrice),test_ready)
+# Check categorical significance
+for (i in names(total)) {
+  if (is.factor(total[,i])) {
+    print(paste('*****',i,'******'))
+    SalesMed = train %>% group_by_(i) %>% dplyr::summarise(t = median(SalePrice),m = mean(SalePrice),sd = sd(SalePrice))
+    df <- (merge(data.frame(table(train[,i])), data.frame(table(test[,i]),by = 'Var1',all=T)))
+    df <- df[,-4]
+    names(df) <- c('Name','Train','Test','SalesMed','SalesMean','SalesSD')
+    print(df %>% arrange(SalesMed))
+  }
+}
+
+
+
 
 
 
