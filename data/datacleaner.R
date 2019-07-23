@@ -197,7 +197,11 @@ list2env(cat_binning(train_ready,test_ready),env=environment())
 cat_stat_sheet(train_binned, test_binned)
 
 
+write.csv(x=train_ready,file = 'data/clean_train_beforebin.csv',row.names = F)
+write.csv(x=test_ready,file = 'data/clean_test_beforebin.csv',row.names = F)
 
 
-write.csv(x=train_binned,file = 'Charlie/datafiles/clean_train.csv',row.names = F)
-write.csv(x=test_binned,file = 'Charlie/datafiles/clean_test.csv',row.names = F)
+write.csv(x=train_binned,file = 'data/clean_train.csv',row.names = F)
+write.csv(x=test_binned,file = 'data/clean_test.csv',row.names = F)
+
+
