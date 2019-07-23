@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LassoCV, Lasso, Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn import datasets
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -44,11 +44,11 @@ def to_numeric(df, col, target="", test = False):
 
 def to_numeric_test(df, col, id_dict):
 	"""Refactors levels to numerals in order of according to key-change dictionary
-	
+
 	Keyword arguments:
 	df -- dataframe
 	col -- column present in dataframe
-	id_dict -- key-change dictionary 
+	id_dict -- key-change dictionary
 
 	Returns:
 	df -- Updated dataframe with ordinated column
@@ -63,7 +63,7 @@ def to_numeric_test(df, col, id_dict):
     #print(dict_keys)
     #print(names)
 	missing_values = [x for x in names if x not in dict_keys]
-    
+
     #print(missing_values)
 	i = len(dict_keys) // 2
 	for name in missing_values:
@@ -75,6 +75,45 @@ def to_numeric_test(df, col, id_dict):
 	df[col] = [id_dict[x] for x in df[col]]
 
 	return df, id_dict
+
+
+def read_and_clean(filepath, test = False, dictonary = {}):
+	if (test):
+		#### Read Data files
+		id_housing = pd.read_csv(filepath)
+		housing = id_housing.drop('Id', axis=1)
+		### Identifies columns by type obj
+		needs_numeric = housing.loc[:, housing.dtypes == "object"]
+		colname = list(needs_numeric.columns)
+		### Process Datafiles for Modelling
+		dict_dictonary = {}
+		for col in colname:
+		    housing.col, id_dictonary = to_numeric_test(housing, col, dictonary)
+		    dict_dictonary.update({col : id_dictonary})
+		housing.columns = housing.columns.str.lower()
+		housing_features = housing
+		feat_labels = housing_features.columns
+		#housing.saleprice = np.log(housing.saleprice)
+		return id_housing.Id, housing_features, feat_labels, dict_dictonary
+	else:
+		#### Read Data files
+		housing = pd.read_csv(filepath).drop('Id', axis=1)
+		### Identifies columns by type obj
+		needs_numeric = housing.loc[:, housing.dtypes == "object"]
+		colname = list(needs_numeric.columns)
+		### Process Datafiles for Modelling
+		dict_dictonary = {}
+		for col in colname:
+		    housing.col, id_dictonary = to_numeric(housing, col, 'SalePrice')
+		    dict_dictonary.update({col : id_dictonary})
+		housing.columns = housing.columns.str.lower()
+		housing_features = housing.drop(['saleprice'], axis=1)
+		feat_labels = housing_features.columns
+		housing.saleprice = np.log(housing.saleprice)
+		return housing, housing_features, feat_labels, dict_dictonary
+
+
+
 
 def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegression):
 	"""Runs a linear model on selected features from a dataset
@@ -90,7 +129,7 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 	Returns:
 
 	"""
-	
+
 
 	## Split Model into Train/Test
 	fTrain, fTest, pTrain, pTest = train_test_split(df.loc[:,feat], target, test_size = split, random_state = 42)
@@ -120,8 +159,20 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 		pPred = lm.predict(fTest)
 		mse = mean_squared_error(pTest, pPred)
 		results = np.exp(pPred)
-	
 
+		return lm, results
+
+	elif (model == Lasso):
+		lasso = LassoCV(cv = 100, tol=0.001, random_state=10)
+
+		lasso.fit(housing_train, price_train)
+
+		#print(lasso.score(housing_train,price_train))
+		#print(lasso.score(housing_test, price_test))
+		selected_coefs = list(np.where(lasso.coef_ != 0))[0]
+		#print(selected_coefs)
+
+		return lasso, selected_coefs
 
 	print('Model: ', model)
 	print('Features: ', feat)
@@ -129,10 +180,44 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 	print('CVS: ', cvs)
 
 
-
+def Submission(df_id, results, filename="submission.csv"):
 	## Generates Submission File for Kaggle
-	#submission = pd.DataFrame(columns = ['Id', 'SalePrice'])
-	#submission['Id'] = housing_test.id
-	#submission['SalePrice'] = results
-	#submission.to_csv('submission.csv', index=False)
+	submission = pd.DataFrame(columns = ['Id', 'SalePrice'])
+	submission['Id'] = df_id
+	submission['SalePrice'] = results
+	submission.to_csv(filename, index=False)
 
+def optimize_penalty(model=Lasso, min_=0,max_=10, step=0.01, plot=True):
+    """
+    Finds the best setting for the penalty term in Regularized Regression
+    Keyword Args:
+    model     -- Which model to to run (default = Lasso)
+    min_      -- min value to test (default = 0)
+    max_      -- max value to test (default = 10)
+    step      -- step size (default = 0.01)
+
+    Returns:
+    coefs_    -- list of model coefficients
+    alphas-   -- list of alpha sizes
+    R2_       -- list of R^2 scores
+    """
+    coefs_ = []
+    term_ = []
+    R2_ = []
+    md = model()
+    for t in np.arange(0,20,0.01):
+        md.set_params(alpha=t)
+        md.fit(fTrain, pTrain)
+        coefs_.append(md.coef_)
+        term_.append(t)
+        R2_.append(md.score(fTest, pTest))
+
+    if plot == True:
+        plt.plot(term_,R2_,c='b',label=r'$R^2$')
+        plt.title(r'$R^2$ v Regularization Penalty')
+        plt.xlabel('Penalty Term')
+        plt.ylabel(r'$R^2$')
+        plt.legend(loc=0)
+        plt.show()
+
+    return coefs_, term_, R2_
