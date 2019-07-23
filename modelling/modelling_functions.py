@@ -136,3 +136,37 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 	#submission['SalePrice'] = results
 	#submission.to_csv('submission.csv', index=False)
 
+def optimize_penalty(model=Lasso, min_=0,max_=10, step=0.01, plot=True):
+    """
+    Finds the best setting for the penalty term in Regularized Regression
+    Keyword Args: 
+    model     -- Which model to to run (default = Lasso)
+    min_      -- min value to test (default = 0)
+    max_      -- max value to test (default = 10)
+    step      -- step size (default = 0.01)
+    
+    Returns:
+    coefs_    -- list of model coefficients
+    alphas-   -- list of alpha sizes
+    R2_       -- list of R^2 scores
+    """
+    coefs_ = []
+    term_ = []
+    R2_ = []
+    md = model()
+    for t in np.arange(0,20,0.01):
+        md.set_params(alpha=t)
+        md.fit(fTrain, pTrain)
+        coefs_.append(md.coef_)
+        term_.append(t)
+        R2_.append(md.score(fTest, pTest))
+    
+    if plot == True:
+        plt.plot(term_,R2_,c='b',label=r'$R^2$')
+        plt.title(r'$R^2$ v Regularization Penalty')
+        plt.xlabel('Penalty Term')
+        plt.ylabel(r'$R^2$')
+        plt.legend(loc=0)
+        plt.show()
+        
+    return coefs_, term_, R2_
