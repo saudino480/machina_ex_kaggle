@@ -1,6 +1,6 @@
 library(dplyr)
 df1 <- read.table('Charlie/cleaned_data.csv')
-df2 <- read.csv('data/mikejr/mikejr_clean.csv')
+df2 <- read.csv('mdrozdov/mdrozdov_cols41_60_clean.csv')
 df3 <- read.csv('mikedollar/train21_40.csv')
 df4 <- read.csv('saudino480/clean_data_1_20.csv')
 df5 <- read.csv('data/train.csv')
