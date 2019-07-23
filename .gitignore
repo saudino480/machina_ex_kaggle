@@ -7,10 +7,10 @@
 *.idea 
 __pychache__
  (python caching) 
-.ipynb_checkpoints 
+*.ipynb_checkpoints 
 venv
-.Rdata
-.Rhistory
+*.Rdata
+*.Rhistory
 
 # Images #
 ###################
@@ -53,11 +53,11 @@ venv
 
 # OS generated files #
 ######################
-.DS_Store
-.DS_Store?
+*.DS_Store
+*.DS_Store?
 ._*
-.Spotlight-V100
-.Trashes
+*.Spotlight-V100
+*.Trashes
 ehthumbs.db
 Thumbs.db
 
