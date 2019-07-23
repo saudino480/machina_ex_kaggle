@@ -43,3 +43,5 @@ for (i in 1:length(train_clean$LotFrontage)){
 
 View(train_clean %>% 
   select(., contains('Garage')))
+
+
