@@ -1,8 +1,10 @@
 library(car)
 library(dplyr)
+library(caret)
 
-train <- read.csv('Charlie/datafiles/train_cc_clean.csv')
-test <- read.csv('Charlie/datafiles/test_cc_clean.csv')
+
+train <- read.csv('data/clean_train.csv')
+test <- read.csv('data/clean_test.csv')
 
 
 colSums(is.na(test))
@@ -29,8 +31,29 @@ pred = predict(model.full, train_test)
 for (i in names(total)) {
   if (is.factor(total[,i])) {
     print(paste('*****',i,'******'))
-    print((merge(data.frame(table(train[,i])), data.frame(table(test[,i])),by = 'Var1',all=T)))
+    SalesMed = train %>% group_by_(i) %>% dplyr::summarise(t = median(SalePrice),m = mean(SalePrice),sd = sd(SalePrice))
+    df <- (merge(data.frame(table(train[,i])), data.frame(table(test[,i]),SalesMed),by = 'Var1',all=T))
+    df <- df[,-4]
+    names(df) <- c('Name','Train','Test','SalesMed','SalesMean','SalesSD')
+    print(df %>% arrange(SalesMed))
   }
 }
 
 table(train[,'Heating'])
+
+
+
+
+
+### Binning Categorical Columns
+total = rbind(train %>% select(-SalePrice),test)
+
+train %>% group_by_(i) %>% dplyr::summarise(m = mean(SalePrice))
+
+train$Alley
+
+for (i in names(total)){
+
+}
+ggplot(data = train) +
+  geom_bar(aes(x = Neighborhood,fill=Neighborhood))
