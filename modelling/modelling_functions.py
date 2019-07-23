@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.linear_model import LinearRegression, LassoCV, Lasso, Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn import datasets
 from sklearn.model_selection import train_test_split, cross_val_score
