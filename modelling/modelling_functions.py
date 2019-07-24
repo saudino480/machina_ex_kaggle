@@ -89,7 +89,8 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		### Process Datafiles for Modelling
 		dict_dictonary = {}
 		for col in colname:
-			housing.col, id_dictonary = to_numeric_test(housing, col, dictonary)
+			housing.col, id_dictonary = to_numeric_test(housing, col, dictonary[col])
+			#print(id_dictonary)
 			dict_dictonary.update({col : id_dictonary})
 		housing.columns = housing.columns.str.lower()
 		housing_features = housing
@@ -106,6 +107,7 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		dict_dictonary = {}
 		for col in colname:
 			housing.col, id_dictonary = to_numeric(housing, col, 'SalePrice')
+			#print(id_dictonary)
 			dict_dictonary.update({col : id_dictonary})
 		housing.columns = housing.columns.str.lower()
 		housing_features = housing.drop(['saleprice'], axis=1)
@@ -187,27 +189,26 @@ def Submission(df_id, results, filename="submission.csv"):
 def optimize_penalty(fTrain, pTrain,model=Lasso, min_=0,max_=10, step_=1000, random=True, riter=100):
     """
     Finds the best setting for the penalty term in Regularized Regression
-    Keyword Args: 
+    Keyword Args:
     model     -- Which model to to run (default = Lasso)
     min_      -- min value to test (default = 0)
     max_      -- max value to test (default = 10)
     step      -- step size (default = 0.01)
     random    -- If True, runs a much faster random grid search
-    riter     -- Number of iterations to run the randomized grid search on 
-    
+    riter     -- Number of iterations to run the randomized grid search on
+
     Returns:
     best_term -- returns the best_estimator for the penalty term
     """
-    
+
     md = model(normalize=True)
     if random:
         param_grid = {'alpha':sp_rand()}
         grid = RandomizedSearchCV(estimator=md,param_distributions=param_grid, n_iter=riter)
     else:
         alphas = np.linspace(min_,max_,step_)
-        grid = GridSearchCV(estimator=md, param_grid=dict(alpha=alphas))
-    
-    grid.fit(fTrain,pTrain) 
-    
+        grid = GridSearchCV(estimator=md, param_grid=dict(alpha=alphas), cv = 5)
+
+    grid.fit(fTrain,pTrain)
+
     return grid
-        
