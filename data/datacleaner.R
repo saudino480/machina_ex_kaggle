@@ -178,7 +178,7 @@ cat_binning <- function(train_df, test_df){
   
   SalePrice <- train_df$SalePrice
   sales <- data.frame("SalePrice" = train_df$SalePrice)
-
+  
   list(train_binned = cbind(df[1:1460,],sales),
        test_binned = df[1461:2919,])
 }
