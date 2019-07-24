@@ -6,10 +6,11 @@ library(glmnet)
 library(caret)
 
 
-train = read.csv('Documents/machina_ex_kaggle/data/clean_train.csv')
+train = read.csv('data/clean_train.csv')
 
 # train = train[,-ncol(train)]
-test = read.csv('Documents/machina_ex_kaggle/data/clean_test.csv')
+test = read.csv('data/clean_test.csv')
+
 
 
 full_df = train
@@ -27,7 +28,7 @@ saleprice = train[,ncol(train)]
 categoricals = cbind(full_df[,sapply(full_df,is.factor)],saleprice)
 categoricals %>% colnames()
 
-scatterplotMatrix(numerics)
+# scatterplotMatrix(numerics)
 
 # NUMERICS ####
 
@@ -52,6 +53,7 @@ vif(lm.fit)[which(vif(lm.fit)>5)]
 
 hi_vif_cols = c('X2ndFlrSF','GarageCars','BsmtFinSF1')
 hi_vif_cols = which(colnames(full_df) %in% hi_vif_cols)
+
 full_df = full_df[,-hi_vif_cols]
 
 numerics= full_df[,!sapply(full_df,is.factor)]
@@ -105,6 +107,7 @@ vif(lm.fit.full)
 which(colnames(full_df)=='PoolQC')
 
 full_df = full_df[,-which(colnames(full_df)=='PoolQC')]
+full_df = full_df[,-which(colnames(full_df)=='MiscVal')]
 
 lm.fit.full = lm(SalePrice~.,data=full_df)
 vif(lm.fit.full)
@@ -122,50 +125,108 @@ outliers = cookd[cookd>0.05 & !is.na(cookd)]
 outliers = as.numeric(outliers %>% names())
 full_df = full_df[-outliers,]
 
-lm.fit.full = lm(SalePrice~.,data=full_df)
+# FEATURE ENGINEERING ####
 
-cookd = cooks.distance(lm.fit.full)
-outliers = cookd[cookd>0.05 & !is.na(cookd)]
-outliers = as.numeric(outliers %>% names())
-full_df = full_df[-outliers,]
-
-lm.fit.full = lm(SalePrice~.,data=full_df)
-
-# LASSO ####
-full_df = cbind(data.frame(scale(numerics)),categoricals)
-categoricals = full_df[,sapply(full_df,is.factor)]     
-                
-x = model.matrix(SalePrice~.,full_df)[,-ncol(full_df)]
-y = full_df$SalePrice
-
-set.seed(0)
-train = sample(1:nrow(x), 7*nrow(x)/10)
-test = (-train)
-y.test = y[test]
+numerics = numerics[,-1]
 
 
-grid = 10^seq(5, -2, length = 100)
+par(mfrow=c(3,3))
+for(i in colnames(numerics)){
+    hist(numerics[,i],main=i)
+    
+}
 
-train_control = trainControl(method = 'cv', number=10)
-tune.grid = expand.grid(lambda = grid, alpha=c(1))
-lasso.caret = train(x[train, ], y[train],
-                    method = 'glmnet',
-                    trControl = train_control, tuneGrid = tune.grid)
+hist(log(numerics$SalePrice))
+hist(sqrt(numerics$GarageArea))
+hist(sqrt(numerics$PoolArea))
+hist(sqrt(numerics$WoodDeckSF))
+hist(sqrt(numerics$OpenPorchSF))
+hist(sqrt(numerics$LotArea))
+hist(sqrt(numerics$BsmtUnfSF))
+hist(sqrt(numerics$BsmtFinSF2))
+hist(sqrt(numerics$X1stFlrSF))
+
+full_df$SalePrice = log(full_df$SalePrice)
+full_df$GarageArea = sqrt(full_df$GarageArea)
+full_df$PoolArea = sqrt(full_df$PoolArea)
+full_df$WoodDeckSF = sqrt(full_df$WoodDeckSF)
+full_df$OpenPorchSF = sqrt(full_df$OpenPorchSF)
+full_df$LotArea = sqrt(full_df$LotArea)
+full_df$BsmtUnfSF = sqrt(full_df$BsmtUnfSF)
+full_df$BsmtFinSF2 = sqrt(full_df$BsmtFinSF2)
+full_df$X1stFlrSF = sqrt(full_df$X1stFlrSF)
 
 
-pred = predict.train(lasso.caret, newdata = x[test,])
-mean((pred - y[test])^2)
-
-
-lasso.models.train = glmnet(x[train, ], y[train], alpha = 1, lambda = grid)
-
-cv.lasso.out = cv.glmnet(x[train, ], y[train],
-                         lambda = grid, alpha = 1, nfolds = 10)
-plot(cv.lasso.out, main = "Lasso Regression\n")
-bestlambda.lasso = cv.lasso.out$lambda.min
-lasso.bestlambdatrain = predict(lasso.models.train, s = bestlambda.lasso, newx = x[test, ])
-mean((lasso.bestlambdatrain - y.test)^2)
+test$GarageArea = sqrt(test$GarageArea)
+test$PoolArea = sqrt(test$PoolArea)
+test$WoodDeckSF = sqrt(test$WoodDeckSF)
+test$OpenPorchSF = sqrt(test$OpenPorchSF)
+test$LotArea = sqrt(test$LotArea)
+test$BsmtUnfSF = sqrt(test$BsmtUnfSF)
+test$BsmtFinSF2 = sqrt(test$BsmtFinSF2)
+test$X1stFlrSF = sqrt(test$X1stFlrSF)
 
 
 
 
+
+dim(full_df)
+dim(test)
+?write.csv
+write.csv(full_df,'data/train_selected_features.csv',row.names = F)
+write.csv(test,'data/test_selected_features.csv',row.names = F)
+
+x1 = read.csv('train_selected_features.csv')
+x2 = read.csv('test_selected_features.csv')
+dim(x1)
+dim(x2)
+full_df
+# # LASSO ####
+# full_df = full_df[,-1]
+# full_df = full_df[,-which(colnames(full_df)=='Utilities')]
+# test_id = test$Id
+# which((colnames(test) %in% colnames(full_df))==FALSE)
+test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
+# test = model.matrix(MSSubClass~.,test)
+# 
+# 
+# x = model.matrix(SalePrice~.,full_df)[,-ncol(full_df)]
+# y = full_df$SalePrice
+# 
+# 
+# 
+# # set.seed(0)
+# # train = sample(1:nrow(x), 7*nrow(x)/10)
+# # test = (-train)
+# # y.test = y[test]
+# 
+# 
+# grid = 10^seq(5, -2, length = 100)
+# 
+# train_control = trainControl(method = 'cv', number=10)
+# tune.grid = expand.grid(lambda = grid, alpha=c(1))
+# lasso.caret = train(x, y,
+#                     method = 'glmnet',
+#                     trControl = train_control, tuneGrid = tune.grid)
+# 
+# 
+# pred = predict.train(lasso.caret, newdata = test)
+# mean((pred - y[test])^2)
+# 
+# 
+# # lasso.models.train = glmnet(x, y, alpha = 1, lambda = grid)
+# # 
+# # cv.lasso.out = cv.glmnet(x, y,
+# #                          lambda = grid, alpha = 1, nfolds = 10)
+# # plot(cv.lasso.out, main = "Lasso Regression\n")
+# # bestlambda.lasso = cv.lasso.out$lambda.min
+# # lasso.bestlambdatrain = predict(lasso.models.train, s = bestlambda.lasso, newx = test)
+# # mean((lasso.bestlambdatrain - y.test)^2)
+# # 
+# # lasso.bestlambdatrain
+# # 
+# # test_id %>% length()
+# # lasso.bestlambdatrain = as.data.frame(lasso.bestlambdatrain)
+# # lasso.bestlambdatrain$'1'
+# 
+# submission = cbind(test_id,lasso.bestlambdatrain)
