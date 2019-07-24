@@ -163,15 +163,136 @@ cat_binning <- function(train_df, test_df){
   df$MasVnrType <- df$MasVnrType %>% fct_collapse(None = c('BrkCmn','None'))
   
   #cat_stat_sheet(df, train_df, test_df)
+  #df$MSSubClass = df$MSSubClass %>% fct_collapse(Othr = c('50', 'Othr')) %>%
+                                    #fct_collapse(High = c('120', '60'))
+  
+  df$Alley = df$Alley %>% fct_collapse(None = c('None', 'Pave'))
+  
+  df$MSZoning = df$MSZoning %>% fct_collapse(Othr = c('RH', 'RM'))
+  
+  df$LotConfig = df$LotConfig %>% fct_collapse(NotCulD = c('Corner', 'Inside', 'FR2')) %>%
+                                  fct_collapse(CulD = c('CulDSac', 'FR3'))
+  
+  df$LandSlope = df$LandSlope %>% fct_collapse(Othr = c('Mod', 'Sev'))
+  
+  df$Neighborhood = df$Neighborhood %>% fct_collapse(Lowest = c('MeadowV', 'IDOTRR', 'BrDale')) %>%
+                                        fct_collapse(Low = c('OldTown', 'Edwards', 'BrkSide')) %>%
+                                        fct_collapse(Med_Low  = c('Sawyer', 'Blueste', 'SWISU', 'NAmes')) %>%
+                                        fct_collapse(Med = c('NPkVill', 'Mitchel')) %>%
+                                        fct_collapse(True_Med = c('SawyerW', 'Gilbert', 'NWAmes')) %>%
+                                        fct_collapse(Med_High = c('Blmngtn', 'CollgCr', 'ClearCr', 'Crawfor')) %>%
+                                        fct_collapse(High = c('Veenker', 'Somerst', 'Timber')) %>%
+                                        fct_collapse(Lux = c('StoneBr', 'NoRidge', 'NridgHt'))
+  
+  df$Condition1 = df$Condition1 %>% fct_collapse(High = c('RRNn', 'PosA', 'PosN', 'RRNe')) %>%
+                                    fct_collapse(Med = c('RRAn', 'Norm', 'RRAn')) %>%
+                                    fct_collapse(Low = c('Feedr', 'Artery'))
+  
+  df$OverallCond = df$OverallCond %>% fct_collapse(Low = c('1', '2', '3'))
+  
+  
+  df$BldgType = df$BldgType %>% fct_collapse(fmCon = c('2fmCon', 'Duplex', 'Twnhs')) %>%
+                                fct_collapse(Fam = c('1Fam', 'TwnhsE'))
+  
+  df$HouseStyle = df$HouseStyle %>% fct_collapse(Low = c('1.5Fin', '2.5Unf', 'SFoyer')) %>%
+                                    fct_collapse(Med = c('1Story', 'SLvl')) %>%
+                                    fct_collapse(High = c('2Story', '2.5Fin'))
+  
+  df$RoofStyle = df$RoofStyle %>% fct_collapse(Low = c('Gambrel', 'Gable')) %>%
+                                  fct_collapse(Med = c('Mansard', 'Hip', 'Flat')) %>%
+                                  fct_collapse(High = c('Shed'))
+  
+  df$RoofMatl = df$RoofMatl %>% fct_collapse(Low = c('Roll', 'ClyTile', 'CompShg', 'Tar&Grv', 'Metal')) %>%
+                                fct_collapse(Med = c('Membran', 'WdShake')) %>%
+                                fct_collapse(High = c('WdShngl'))
+  
+  df$Exterior1st = df$Exterior1st %>% fct_collapse(Low = c('BrkComm','AsphShn', 'CBlock', 'AsbShng')) %>%
+                                      fct_collapse(Med = c('WdShing', 'Wd Sdng', 'MetalSd')) %>%
+                                      fct_collapse(High = c('Stucco', 'HdBoard')) %>%
+                                      fct_collapse(Highest = c('BrkFace', 'Plywood')) %>%
+                                      fct_collapse(Lux = c('Stone', 'ImStucc'))
+    
+  df$Exterior2nd = df$Exterior2nd %>% fct_collapse(Lowest = c('CBlock', 'AsbShng')) %>%
+                                      fct_collapse(Low = c('Wd Sdng', 'Wd Shng', 'MetalSd', 'AsphShn',
+                                                           'Stucco', 'Brk Cmn')) %>%
+                                      fct_collapse(Med = c('HdBoard', 'BrkFace', 'Plywood')) %>%
+                                      fct_collapse(High = c('Stone', 'ImStucc')) %>%
+                                      fct_collapse(Highest = c('CmentBd', 'Other'))
+  
+                        
+  df$ExterCond = df$ExterCond %>% fct_collapse(TA = c('TA', 'Ex')) %>%
+                                  fct_collapse(Po = c('Po', 'Fa'))
+  
+  df$Foundation = df$Foundation %>% fct_collapse(Stone = c('CBlock', 'Stone')) %>%
+                                    fct_collapse(Other = c('Wood', 'PConc'))
+  
+  df$BsmtQual = df$BsmtQual %>% fct_collapse(None = c('None', 'Fa'))
+  
+  df$BsmtCond = df$BsmtCond %>% fct_collapse(Med = c('None', 'Fa')) %>%
+                                fct_collapse(High = c('TA', 'Gd'))
+  
+  df$BsmtExposure = df$BsmtExposure %>% fct_collapse(Med = c('Mn', 'Av'))
+  
+  df$BsmtFinType1 = df$BsmtFinType1 %>% fct_collapse(Low = c('LwQ', 'BLQ', 'Rec')) %>%
+                                        fct_collapse(Med = c('ALQ', 'Unf')) %>%
+                                        fct_collapse(High = c('GLQ'))
+  
+  df$HeatingQC = df$HeatingQC %>% fct_collapse(Med = c('Fa', 'TA', 'Gd'))
+  
+  df$Electrical = df$Electrical %>% fct_collapse(Low = c('Mix', 'FuseP')) %>%
+                                    fct_collapse(Med = c('FuseF', 'FuseA')) %>%
+                                    fct_collapse(High = c('SBrkr'))
+  
+  df$Functional = df$Functional %>% fct_collapse(Low = c('Maj2')) %>%
+                                    fct_collapse(Med = c('Sev', 'Mod', 'Min1', 'Min2', 'Maj1')) %>%
+                                    fct_collapse(High = c('Typ'))
+  
+  df$FireplaceQu = df$FireplaceQu %>% fct_collapse(Low = c('Po', 'None')) %>%
+                                      fct_collapse(TA = c('TA', 'Gd'))
+  
+  df$GarageType = df$GarageType %>% fct_collapse(Low = c('None', 'CarPort')) %>%
+                                    fct_collapse(Med = c('Detchd', 'Basment', '2Types')) %>%
+                                    fct_collapse(High = c('Attchd')) %>%
+                                    fct_collapse(Highest = c('BuiltIn'))
+                                    
+  df$PoolQC = df$PoolQC %>% fct_collapse(Low = c('None', 'Gd', 'Fa')) %>%
+                            fct_collapse(High = c('Ex'))
+  
+  df$Fence = df$Fence %>% fct_collapse(Low = c('MnWw')) %>%
+                          fct_collapse(Med = c('MnPrv', 'GdWo')) %>%
+                          fct_collapse(High = c('GdPrv'))
+  
+  df$SaleType = df$SaleType %>% fct_collapse(Low = c('Oth', 'ConLI')) %>%
+                                fct_collapse(Med = c('COD', 'ConLD', 'ConLw', 'WD')) %>%
+                                fct_collapse(High = c('New', 'Con'))
+                                
+  df$SaleCondition = df$SaleCondition %>% fct_collapse(Low = c('AdjLand')) %>%
+                                          fct_collapse(Med = c('Abnorml', 'Family', 'Alloca')) %>%
+                                          fct_collapse(Med_High = c('Normal')) %>%
+                                          fct_collapse(High = c('Partial'))
+  
+  
+  
+  
+  
+                                    
+  
+  
+  
+  #df$KitchenQual = df$KitchenQual %>% fct_collapse(TA = c('TA', 'Othr'))
+  
+  #df$GarageType = df$GarageType %>% fct_collapse(Detchd = c('Othr', Detchd))
+  
+  #df$SaleCondition = df$SaleCondition %>% fct_collapse(Othr = c('Othr', 'Abnorml'))
   
   
   
   ### Bin Categories by Frequency of Appearance. Default is 5%
-  for (i in names(df)) {
-    if (is.factor(df[,i])) {
-      df[,i] <- create_other_total(df[,i])
-    }
-  }
+  #for (i in names(df)) {
+  #  if (is.factor(df[,i])) {
+  #    df[,i] <- create_other_total(df[,i])
+  #  }
+  #}
   
   
   
@@ -195,7 +316,6 @@ list2env(cat_binning(train_ready,test_ready),env=environment())
 
 
 cat_stat_sheet(train_binned, test_binned)
-
 
 write.csv(x=train_ready,file = 'data/clean_train_beforebin.csv',row.names = F)
 write.csv(x=test_ready,file = 'data/clean_test_beforebin.csv',row.names = F)
