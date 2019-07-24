@@ -59,19 +59,19 @@ def to_numeric_test(df, col, id_dict):
 	dict_keys = list(id_dict.keys())
 
 	names = list(df[col].unique())
-    #print(col, "*"*50)
-    #print(dict_keys)
-    #print(names)
+	#print(col, "*"*50)
+	#print(dict_keys)
+	#print(names)
 	missing_values = [x for x in names if x not in dict_keys]
 
-    #print(missing_values)
+	#print(missing_values)
 	i = len(dict_keys) // 2
 	for name in missing_values:
-        #print(name)
+		#print(name)
 		id_dict.update({name: i})
-    #print("Encoded values for: ", col)
-    #print(id_dict)
-    #print(df[col].unique())
+	#print("Encoded values for: ", col)
+	#print(id_dict)
+	#print(df[col].unique())
 	df[col] = [id_dict[x] for x in df[col]]
 
 	return df, id_dict
@@ -87,8 +87,8 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		### Process Datafiles for Modelling
 		dict_dictonary = {}
 		for col in colname:
-		    housing.col, id_dictonary = to_numeric_test(housing, col, dictonary)
-		    dict_dictonary.update({col : id_dictonary})
+			housing.col, id_dictonary = to_numeric_test(housing, col, dictonary)
+			dict_dictonary.update({col : id_dictonary})
 		housing.columns = housing.columns.str.lower()
 		housing_features = housing
 		feat_labels = housing_features.columns
@@ -103,8 +103,8 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		### Process Datafiles for Modelling
 		dict_dictonary = {}
 		for col in colname:
-		    housing.col, id_dictonary = to_numeric(housing, col, 'SalePrice')
-		    dict_dictonary.update({col : id_dictonary})
+			housing.col, id_dictonary = to_numeric(housing, col, 'SalePrice')
+			dict_dictonary.update({col : id_dictonary})
 		housing.columns = housing.columns.str.lower()
 		housing_features = housing.drop(['saleprice'], axis=1)
 		feat_labels = housing_features.columns
@@ -142,7 +142,7 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 		# Measure Feature Importance
 		feature_selected = []
 		for feature_list_index in sfm.get_support(indices=True):
-		    feature_selected.append(feat_labels[feature_list_index])
+			feature_selected.append(feat_labels[feature_list_index])
 		proxy = feature_selected
 		trimmed = ['x1stflrsf', 'x2ndflrsf', 'garagecars', 'overallcond', 'saleprice', 'Unnamed: 0', 'bsmtfinsf1']
 		housing_features = housing_features[proxy]
@@ -159,7 +159,7 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 		return lm, results
 
 	elif (model == Lasso):
-		lasso = LassoCV(cv = 100, tol=0.001, random_state=10)
+		lasso = Lasso()
 
 		lasso.fit(housing_train, price_train)
 
@@ -182,37 +182,38 @@ def Submission(df_id, results, filename="submission.csv"):
 	submission['SalePrice'] = results
 	submission.to_csv(filename, index=False)
 
-def optimize_penalty(model=Lasso, min_=0,max_=10, step=0.01, plot=True):
-    """
-    Finds the best setting for the penalty term in Regularized Regression
-    Keyword Args:
-    model     -- Which model to to run (default = Lasso)
-    min_      -- min value to test (default = 0)
-    max_      -- max value to test (default = 10)
-    step      -- step size (default = 0.01)
+def optimize_penalty(features, target, model = Lasso, min_=0,max_=10, step=0.01, plot=True):
+	"""
+	Finds the best setting for the penalty term in Regularized Regression
+	Keyword Args:
+	model     -- Which model to to run (default = Lasso)
+	min_      -- min value to test (default = 0)
+	max_      -- max value to test (default = 10)
+	step      -- step size (default = 0.01)
 
-    Returns:
-    coefs_    -- list of model coefficients
-    alphas-   -- list of alpha sizes
-    R2_       -- list of R^2 scores
-    """
-    coefs_ = []
-    term_ = []
-    R2_ = []
-    md = model()
-    for t in np.arange(0,20,0.01):
-        md.set_params(alpha=t)
-        md.fit(fTrain, pTrain)
-        coefs_.append(md.coef_)
-        term_.append(t)
-        R2_.append(md.score(fTest, pTest))
+	Returns:
+	coefs_    -- list of model coefficients
+	alphas-   -- list of alpha sizes
+	R2_       -- list of R^2 scores
+	"""
+	coefs_ = []
+	term_ = []
+	R2_ = []
+	md = model()
+	features_train, features_test, price_train, price_test = train_test_split(features, target, test_size = 0.2)
+	for t in np.arange(min_,max_,0.01):
+		md.set_params(alpha=t)
+		md.fit(features, target)
+		coefs_.append(md.coef_)
+		term_.append(t)
+		R2_.append(md.score(features_test, price_test))
 
-    if plot == True:
-        plt.plot(term_,R2_,c='b',label=r'$R^2$')
-        plt.title(r'$R^2$ v Regularization Penalty')
-        plt.xlabel('Penalty Term')
-        plt.ylabel(r'$R^2$')
-        plt.legend(loc=0)
-        plt.show()
+	if plot == True:
+		plt.plot(term_,R2_,c='b',label=r'$R^2$')
+		plt.title(r'$R^2$ v Regularization Penalty')
+		plt.xlabel('Penalty Term')
+		plt.ylabel(r'$R^2$')
+		plt.legend(loc=0)
+		plt.show()
 
-    return coefs_, term_, R2_
+	return coefs_, term_, R2_
