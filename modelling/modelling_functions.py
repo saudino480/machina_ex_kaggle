@@ -76,7 +76,6 @@ def to_numeric_test(df, col, id_dict):
 
 	return df, id_dict
 
-
 def read_and_clean(filepath, test = False, dictonary = {}):
 	if (test):
 		#### Read Data files
@@ -111,9 +110,6 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		feat_labels = housing_features.columns
 		housing.saleprice = np.log(housing.saleprice)
 		return housing, housing_features, feat_labels, dict_dictonary
-
-
-
 
 def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegression):
 	"""Runs a linear model on selected features from a dataset
@@ -178,7 +174,6 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 	print('Features: ', feat)
 	print('MSE: ', mse)
 	print('CVS: ', cvs)
-
 
 def Submission(df_id, results, filename="submission.csv"):
 	## Generates Submission File for Kaggle
