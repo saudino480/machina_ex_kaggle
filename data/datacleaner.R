@@ -139,16 +139,16 @@ create_other_test <- function(col, trained){
   col <- col %>% fct_collapse(Othr = test_factors[test_factors %ni% trained_factors])
   return (col)
 }
-  
-create_other_total <- function(col, perc=0.05) {
+
+create_other_total <- function(df, col, perc=0.05) {
   # Create an 'othr' factor for levels with a population of less than perc (default 0.05)
   pop = list()
-  for (i in levels(col)) {
-    if (count(col == i)[2,2] < 2919 * perc) {
+  for (i in levels(df[,col])) {
+    if (sum(df[,col] == i) < 2919 * perc) {
       pop <- c(pop, i)
     }
   }
-  return(col <- col %>% fct_collapse(Othr = pop))
+  return(df[,col] <- df[,col] %>% fct_collapse(Othr = pop))
 }
 
 
@@ -158,21 +158,19 @@ cat_binning <- function(train_df, test_df){
   
   ###### Write Functions Within Here ######
   ## To Be Binned ##
-
+  
   df$LotShape <- df$LotShape %>% fct_collapse(IRG = c('IR1','IR2','IR3'))
   df$MasVnrType <- df$MasVnrType %>% fct_collapse(None = c('BrkCmn','None'))
   
   #cat_stat_sheet(df, train_df, test_df)
   
   
-  
   ### Bin Categories by Frequency of Appearance. Default is 5%
   for (i in names(df)) {
     if (is.factor(df[,i])) {
-      df[,i] <- create_other_total(df[,i])
+      df[,i] <- create_other_total(df, i)
     }
   }
-  
   
   
   
@@ -180,7 +178,7 @@ cat_binning <- function(train_df, test_df){
   
   SalePrice <- train_df$SalePrice
   sales <- data.frame("SalePrice" = train_df$SalePrice)
-  
+
   list(train_binned = cbind(df[1:1460,],sales),
        test_binned = df[1461:2919,])
 }
