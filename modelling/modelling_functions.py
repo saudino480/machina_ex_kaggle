@@ -3,12 +3,10 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import pandas as pd
 import numpy as np
-from scipy.stats import uniform as sp_rand
 from sklearn.linear_model import LinearRegression, LassoCV, Lasso, Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn import datasets
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics import accuracy_score, mean_squared_error
 
@@ -57,8 +55,9 @@ def to_numeric_test(df, col, id_dict):
 	id_dict -- Key-Change Dictionary for altered column
 	"""
 
+	local_dict = id_dict[col]
 
-	dict_keys = list(id_dict.keys())
+	dict_keys = list(local_dict.keys())
 
 	names = list(df[col].unique())
 	#print(col, "*"*50)
@@ -70,13 +69,14 @@ def to_numeric_test(df, col, id_dict):
 	i = len(dict_keys) // 2
 	for name in missing_values:
 		#print(name)
-		id_dict.update({name: i})
+		local_dict.update({name: i})
 	#print("Encoded values for: ", col)
-	#print(id_dict)
+	#print(local_dict)
 	#print(df[col].unique())
-	df[col] = [id_dict[x] for x in df[col]]
+	df[col] = [local_dict[x] for x in df[col]]
 
-	return df, id_dict
+	return df, local_dict
+
 
 def read_and_clean(filepath, test = False, dictonary = {}):
 	if (test):
@@ -89,9 +89,9 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		### Process Datafiles for Modelling
 		dict_dictonary = {}
 		for col in colname:
-			housing.col, id_dictonary = to_numeric_test(housing, col, dictonary[col])
-			#print(id_dictonary)
+			housing.col, id_dictonary = to_numeric_test(housing, col, dictonary)
 			dict_dictonary.update({col : id_dictonary})
+			#print(id_dictonary[col], " and ", col)
 		housing.columns = housing.columns.str.lower()
 		housing_features = housing
 		feat_labels = housing_features.columns
@@ -103,17 +103,20 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		### Identifies columns by type obj
 		needs_numeric = housing.loc[:, housing.dtypes == "object"]
 		colname = list(needs_numeric.columns)
+		#print(colname)
 		### Process Datafiles for Modelling
 		dict_dictonary = {}
 		for col in colname:
 			housing.col, id_dictonary = to_numeric(housing, col, 'SalePrice')
-			#print(id_dictonary)
 			dict_dictonary.update({col : id_dictonary})
 		housing.columns = housing.columns.str.lower()
 		housing_features = housing.drop(['saleprice'], axis=1)
 		feat_labels = housing_features.columns
-		housing.saleprice = np.log(housing.saleprice)
+		#housing.saleprice = np.log(housing.saleprice)
 		return housing, housing_features, feat_labels, dict_dictonary
+
+
+
 
 def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegression):
 	"""Runs a linear model on selected features from a dataset
@@ -164,8 +167,8 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 
 	elif (model == Lasso):
 		lasso = Lasso()
-		lasso.set_params(alpha = optimize_penalty(model=Lasso, fTrain=fTrain, pTrain=pTrain, random=True))
-		lasso.fit(fTrain, pTrain)
+
+		lasso.fit(housing_train, price_train)
 
 		#print(lasso.score(housing_train,price_train))
 		#print(lasso.score(housing_test, price_test))
@@ -179,6 +182,7 @@ def run_linear_model(df, feat = [], target='prices',split=0.33,model=LinearRegre
 	print('MSE: ', mse)
 	print('CVS: ', cvs)
 
+
 def Submission(df_id, results, filename="submission.csv"):
 	## Generates Submission File for Kaggle
 	submission = pd.DataFrame(columns = ['Id', 'SalePrice'])
@@ -186,29 +190,47 @@ def Submission(df_id, results, filename="submission.csv"):
 	submission['SalePrice'] = results
 	submission.to_csv(filename, index=False)
 
-def optimize_penalty(fTrain, pTrain,model=Lasso, min_=0,max_=10, step_=1000, random=True, riter=100):
-    """
-    Finds the best setting for the penalty term in Regularized Regression
-    Keyword Args:
-    model     -- Which model to to run (default = Lasso)
-    min_      -- min value to test (default = 0)
-    max_      -- max value to test (default = 10)
-    step      -- step size (default = 0.01)
-    random    -- If True, runs a much faster random grid search
-    riter     -- Number of iterations to run the randomized grid search on
+def optimize_penalty(features, target, model = Lasso, min_=0,max_=10, step=0.01, plot=True):
+	"""
+	Finds the best setting for the penalty term in Regularized Regression
+	Keyword Args:
+	model     -- Which model to to run (default = Lasso)
+	min_      -- min value to test (default = 0)
+	max_      -- max value to test (default = 10)
+	step      -- step size (default = 0.01)
 
-    Returns:
-    best_term -- returns the best_estimator for the penalty term
-    """
+	Returns:
+	coefs_    -- list of model coefficients
+	alphas-   -- list of alpha sizes
+	R2_       -- list of R^2 scores
+	"""
+	coefs_ = []
+	term_ = []
+	R2_ = []
+	md = model()
+	features_train, features_test, price_train, price_test = train_test_split(features, target, test_size = 0.2)
+	for t in np.arange(min_,max_,0.01):
+		md.set_params(alpha=t)
+		md.fit(features, target)
+		coefs_.append(md.coef_)
+		term_.append(t)
+		R2_.append(md.score(features_test, price_test))
 
-    md = model(normalize=True)
-    if random:
-        param_grid = {'alpha':sp_rand()}
-        grid = RandomizedSearchCV(estimator=md,param_distributions=param_grid, n_iter=riter)
-    else:
-        alphas = np.linspace(min_,max_,step_)
-        grid = GridSearchCV(estimator=md, param_grid=dict(alpha=alphas), cv = 5)
+	if plot == True:
+		plt.plot(term_,R2_,c='b',label=r'$R^2$')
+		plt.title(r'$R^2$ v Regularization Penalty')
+		plt.xlabel('Penalty Term')
+		plt.ylabel(r'$R^2$')
+		plt.legend(loc=0)
+		plt.show()
 
-    grid.fit(fTrain,pTrain)
+	return coefs_, term_, R2_
 
-    return grid
+def undo_transform(train, test, col, transform):
+    if (transform == "sqrt"):
+        train[col] = train[col]**2
+        test[col] = test[col]**2
+    elif (transform == "log"):
+        train[col] = np.exp(train[col])
+        test[col] = np.exp(test[col])
+    #return train[col], test[col]
