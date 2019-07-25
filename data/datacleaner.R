@@ -275,6 +275,10 @@ cat_binning <- function(train_df, test_df){
 
 
 
+
+
+
+
   #df$KitchenQual = df$KitchenQual %>% fct_collapse(TA = c('TA', 'Othr'))
 
   #df$GarageType = df$GarageType %>% fct_collapse(Detchd = c('Othr', Detchd))
