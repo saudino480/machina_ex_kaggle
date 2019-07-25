@@ -17,7 +17,7 @@ venv
 *.png
 *.jpg
 *.jpeg
-
+*.csv
 
 # Compiled source #
 ###################
