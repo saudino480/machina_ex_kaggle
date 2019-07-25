@@ -60,19 +60,19 @@ def to_numeric_test(df, col, id_dict):
 	dict_keys = list(local_dict.keys())
 
 	names = list(df[col].unique())
-	print(col, "*"*50)
-	print(dict_keys)
-	print(names)
+	#print(col, "*"*50)
+	#print(dict_keys)
+	#print(names)
 	missing_values = [x for x in names if x not in dict_keys]
 
-	print(missing_values)
+	#print(missing_values)
 	i = len(dict_keys) // 2
 	for name in missing_values:
 		#print(name)
 		local_dict.update({name: i})
 	#print("Encoded values for: ", col)
-	print(local_dict)
-	print(df[col].unique())
+	#print(local_dict)
+	#print(df[col].unique())
 	df[col] = [local_dict[x] for x in df[col]]
 
 	return df, local_dict
@@ -103,7 +103,7 @@ def read_and_clean(filepath, test = False, dictonary = {}):
 		### Identifies columns by type obj
 		needs_numeric = housing.loc[:, housing.dtypes == "object"]
 		colname = list(needs_numeric.columns)
-		print(colname)
+		#print(colname)
 		### Process Datafiles for Modelling
 		dict_dictonary = {}
 		for col in colname:

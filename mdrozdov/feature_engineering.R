@@ -40,9 +40,12 @@ vif(lm.fit)
 
 alias(lm.fit)
 
-which(colnames(train)=='TotalBsmtSF')
-which(colnames(train)=='GrLivArea')
-collinear_cols = c(39,47)
+which(colnames(train)=='BsmtFinSF1')
+which(colnames(train)=='BsmtFinSF2')
+which(colnames(train)=='X1stFlrSF')
+which(colnames(train)=='X2ndFlrSF')
+which(colnames(train)=='LotFrontage')
+collinear_cols = c(35, 37, 44, 45, 4)
 
 full_df = full_df[,-collinear_cols]
 numerics= full_df[,!sapply(full_df,is.factor)]
@@ -144,8 +147,14 @@ hist(sqrt(numerics$OpenPorchSF))
 hist(sqrt(numerics$LotArea))
 hist(sqrt(numerics$BsmtUnfSF))
 hist(sqrt(numerics$BsmtFinSF2))
-hist(sqrt(numerics$X1stFlrSF))
+hist(sqrt(numerics$GrLivArea))
 
+sqrt_pair = function(df1, df2, col) {
+
+  df1[col] = sqrt(df1[col])
+  df2[col] = sqrt(df2[col])
+}
+sqrt_pair(full_df, test_df, GarageArea)
 full_df$SalePrice = log(full_df$SalePrice)
 full_df$GarageArea = sqrt(full_df$GarageArea)
 full_df$PoolArea = sqrt(full_df$PoolArea)
@@ -153,8 +162,7 @@ full_df$WoodDeckSF = sqrt(full_df$WoodDeckSF)
 full_df$OpenPorchSF = sqrt(full_df$OpenPorchSF)
 full_df$LotArea = sqrt(full_df$LotArea)
 full_df$BsmtUnfSF = sqrt(full_df$BsmtUnfSF)
-full_df$BsmtFinSF2 = sqrt(full_df$BsmtFinSF2)
-full_df$X1stFlrSF = sqrt(full_df$X1stFlrSF)
+full_df$TotalBsmtSF = sqrt(full_df$TotalBsmtSF)
 
 
 test$GarageArea = sqrt(test$GarageArea)
