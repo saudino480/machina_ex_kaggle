@@ -38,12 +38,14 @@ vif(lm.fit)
 
 alias(lm.fit)
 
+
 collinear_cols = c(which(colnames(train)=='X2ndFlrSF'),
                    which(colnames(train)=='LowQualFinSF'),
                    which(colnames(train)=='BsmtFinSF1'),
                    which(colnames(train)=='BsmtFinSF2'),
                    which(colnames(train)=='BsmtUnfSF'),
                    which(colnames(train)=='X1stFlrSF'))
+
 
 full_df = full_df[,-collinear_cols]
 
@@ -108,6 +110,7 @@ full_df = full_df[-outliers,]
 
 # FEATURE ENGINEERING ####
 
+
 # numerics = numerics[,-1]
 # 
 # 
@@ -146,7 +149,51 @@ full_df = full_df[-outliers,]
 # test$BsmtUnfSF = sqrt(test$BsmtUnfSF)
 # test$BsmtFinSF2 = sqrt(test$BsmtFinSF2)
 # test$X1stFlrSF = sqrt(test$X1stFlrSF)
+=======
+numerics = numerics[,-1]
 
+
+par(mfrow=c(3,3))
+for(i in colnames(numerics)){
+    hist(numerics[,i],main=i)
+    
+}
+
+hist(log(numerics$SalePrice))
+hist(sqrt(numerics$GarageArea))
+hist(sqrt(numerics$PoolArea))
+hist(sqrt(numerics$WoodDeckSF))
+hist(sqrt(numerics$OpenPorchSF))
+hist(sqrt(numerics$LotArea))
+hist(sqrt(numerics$BsmtUnfSF))
+hist(sqrt(numerics$BsmtFinSF2))
+hist(sqrt(numerics$GrLivArea))
+
+
+
+full_df$SalePrice = log(full_df$SalePrice)
+
+full_df$GarageArea = sqrt(full_df$GarageArea)
+full_df$PoolArea = sqrt(full_df$PoolArea)
+full_df$WoodDeckSF = sqrt(full_df$WoodDeckSF)
+full_df$OpenPorchSF = sqrt(full_df$OpenPorchSF)
+full_df$LotArea = sqrt(full_df$LotArea)
+full_df$BsmtUnfSF = sqrt(full_df$BsmtUnfSF)
+full_df$TotalBsmtSF = sqrt(full_df$TotalBsmtSF)
+full_df$GrLivArea = sqrt(full_df$GrLivArea)
+
+test$GarageArea = sqrt(test$GarageArea)
+test$PoolArea = sqrt(test$PoolArea)
+test$WoodDeckSF = sqrt(test$WoodDeckSF)
+test$OpenPorchSF = sqrt(test$OpenPorchSF)
+test$LotArea = sqrt(test$LotArea)
+test$BsmtUnfSF = sqrt(test$BsmtUnfSF)
+test$TotalBsmtSF = sqrt(test$TotalBsmtSF)
+test$GrLivArea = sqrt(test$GrLivArea)
+
+
+
+test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 
 test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 
@@ -162,7 +209,6 @@ write.csv(test,'data/test_selected_features.csv',row.names = F)
 # full_df = full_df[,-which(colnames(full_df)=='Utilities')]
 # test_id = test$Id
 # which((colnames(test) %in% colnames(full_df))==FALSE)
-# test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 # test = model.matrix(MSSubClass~.,test)
 # 
 # 
