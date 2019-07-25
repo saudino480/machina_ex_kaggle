@@ -149,13 +149,10 @@ hist(sqrt(numerics$BsmtUnfSF))
 hist(sqrt(numerics$BsmtFinSF2))
 hist(sqrt(numerics$GrLivArea))
 
-sqrt_pair = function(df1, df2, col) {
 
-  df1[col] = sqrt(df1[col])
-  df2[col] = sqrt(df2[col])
-}
-sqrt_pair(full_df, test_df, GarageArea)
+
 full_df$SalePrice = log(full_df$SalePrice)
+
 full_df$GarageArea = sqrt(full_df$GarageArea)
 full_df$PoolArea = sqrt(full_df$PoolArea)
 full_df$WoodDeckSF = sqrt(full_df$WoodDeckSF)
@@ -163,7 +160,7 @@ full_df$OpenPorchSF = sqrt(full_df$OpenPorchSF)
 full_df$LotArea = sqrt(full_df$LotArea)
 full_df$BsmtUnfSF = sqrt(full_df$BsmtUnfSF)
 full_df$TotalBsmtSF = sqrt(full_df$TotalBsmtSF)
-
+full_df$GrLivArea = sqrt(full_df$GrLivArea)
 
 test$GarageArea = sqrt(test$GarageArea)
 test$PoolArea = sqrt(test$PoolArea)
@@ -171,10 +168,11 @@ test$WoodDeckSF = sqrt(test$WoodDeckSF)
 test$OpenPorchSF = sqrt(test$OpenPorchSF)
 test$LotArea = sqrt(test$LotArea)
 test$BsmtUnfSF = sqrt(test$BsmtUnfSF)
-test$BsmtFinSF2 = sqrt(test$BsmtFinSF2)
-test$X1stFlrSF = sqrt(test$X1stFlrSF)
+test$TotalBsmtSF = sqrt(test$TotalBsmtSF)
+test$GrLivArea = sqrt(test$GrLivArea)
 
 
+test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 
 
 
@@ -194,7 +192,6 @@ full_df
 # full_df = full_df[,-which(colnames(full_df)=='Utilities')]
 # test_id = test$Id
 # which((colnames(test) %in% colnames(full_df))==FALSE)
-test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 # test = model.matrix(MSSubClass~.,test)
 # 
 # 
