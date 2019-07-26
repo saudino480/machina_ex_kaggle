@@ -94,7 +94,7 @@ def read_and_clean(filepath, test = False):
 				'GarageYrBlt', 'GarageCars', 'MiscVal', 'MoSold', 'YrSold',
 				'MSSubClass']
 		trans_colname = [x for x in trans_colname if x not in trim]
-		print(trans_colname)
+		#print(trans_colname)
 		### Process Datafiles for Modelling
 		for col in trans_colname:
 			if (col == 'SalePrice'):
@@ -132,7 +132,7 @@ def read_and_clean(filepath, test = False):
 				'GarageYrBlt', 'GarageCars', 'MiscVal', 'MoSold', 'YrSold',
 				'MSSubClass']
 		trans_colname = [x for x in trans_colname if x not in trim]
-		print(trans_colname)
+		#print(trans_colname)
 		### Process Datafiles for Modelling
 		for col in trans_colname:
 			if (col == 'SalePrice'):
@@ -151,6 +151,7 @@ def read_and_clean(filepath, test = False):
 		housing_features = housing.drop(['saleprice'], axis=1)
 		feat_labels = housing_features.columns
 		#housing.saleprice = np.log(housing.saleprice)
+        
 		return housing, housing_features, feat_labels#, dict_dictonary
 
 
