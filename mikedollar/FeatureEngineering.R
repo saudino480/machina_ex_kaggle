@@ -16,7 +16,8 @@ fe_drop =c('X3SsnPorch','GrLivArea', 'Fireplaces', 'HalfBath',
            'BedroomAbvGr','FullBath', 'HalfBath',
            'BsmtFinType2','TotalBsmtSF', 'X1stFlrSF', 
            'X2ndFlrSF', 'TotRmsAbvGrd', 'LotArea', 
-           'LotFrontage', 'PoolArea', 'MoSold', 'YrSold')
+           'LotFrontage', 'PoolArea', 'MoSold', 'YrSold',
+           'Condition1', 'Condition2')
 
 # Train
 train = train %>% 
@@ -25,7 +26,6 @@ train = train %>%
          LotFA = (LotArea)^.5 + LotFrontage, 
          RmsPerLivSpc = TotRmsAbvGrd/(X1stFlrSF + X2ndFlrSF),
          TotalBath = FullBath + HalfBath,
-         RmsPerLivSpc = TotRmsAbvGrd/(X1stFlrSF + X2ndFlrSF),
          FPperSF = Fireplaces/TotalSpaceSF
          )
 train = train %>% 
@@ -38,7 +38,6 @@ test = test %>%
          LotFA = (LotArea)^.5 + LotFrontage, 
          RmsPerLivSpc = TotRmsAbvGrd/(X1stFlrSF + X2ndFlrSF),
          TotalBath = FullBath + HalfBath,
-         RmsPerLivSpc = TotRmsAbvGrd/(X1stFlrSF + X2ndFlrSF),
          FPperSF = Fireplaces/TotalSpaceSF
          )
 test = test %>% 
@@ -72,7 +71,7 @@ test = test %>%
   ScreenPorch_tog = ifelse(ScreenPorch==min(ScreenPorch), 0,1))                       
           
 
-library(fastDummies)
 
-write.csv(train, 'clean_data/train_fe_dum.csv', row.names = F)
-write.csv(test, 'clean_data/test_fe_dum.csv', row.names = F)
+
+write.csv(train, 'clean_data/train_fe.csv', row.names = F)
+write.csv(test, 'clean_data/test_fe.csv', row.names = F)
