@@ -195,7 +195,7 @@ test$GrLivArea = sqrt(test$GrLivArea)
 
 test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 
-test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
+#test = test[,-which((colnames(test) %in% colnames(full_df))==FALSE)]
 
 
 dim(full_df)
