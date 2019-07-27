@@ -273,3 +273,25 @@ def undo_transform(train, test, col, transform):
         train[col] = np.exp(train[col])
         test[col] = np.exp(test[col])
     #return train[col], test[col]
+
+    
+def plot_model_accuracy(df):
+    fig, ax1 = plt.subplots()    
+    #ax1.plot(df.index, df['Train Score'],label = 'Train Score')
+    ax1.plot(df.index, df['Kaggle Metric'],label='Test Score')
+    ax1.set_xlabel('L1_Ratio')
+    plt.xticks(rotation=40)
+    ax1.set_ylabel('RMSE')
+    plt.title('Model Fitness on Test Set')
+    plt.legend(loc=1)
+    plt.show()
+    
+def rmsle(real, predicted):
+    sum=0.0
+    for x in range(len(predicted)):
+        if predicted[x]<0 or real[x]<0: #check for negative values
+            continue
+        p = (predicted[x]+1)
+        r = (real[x]+1)
+        sum = sum + (p - r)**2
+    return (sum/len(predicted))**0.5
